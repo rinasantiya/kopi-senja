@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — Kopi Senja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="container">
+    <a href="index.html" class="brand">Kopi<span class="dot">.</span>Senja</a>
+    <nav class="main"><a href="index.html">Kembali ke Menu</a></nav>
+    <div class="header-actions"></div>
+  </div>
+</header>
+
+<main class="container checkout-grid">
+  <div class="panel">
+    <h2>Data Pengantaran</h2>
+    <p style="color:var(--ink-soft); font-size:14px;">Lengkapi data pengantaran dan pilih metode pembayaran.</p>
+    <form id="checkoutForm" novalidate onsubmit="return false;">
+      <div class="form-grid">
+        <div class="form-group" id="grp-nama">
+          <label>Nama Penerima</label>
+          <input type="text" id="nama" placeholder="Nama lengkap">
+          <span class="error-msg">Nama minimal 3 karakter.</span>
+        </div>
+        <div class="form-group" id="grp-telp">
+          <label>No. HP</label>
+          <input type="text" id="telp" placeholder="08xxxxxxxxxx">
+          <span class="error-msg">Format nomor HP tidak valid.</span>
+        </div>
+        <div class="form-group full" id="grp-email">
+          <label>Email</label>
+          <input type="text" id="email" placeholder="nama@email.com">
+          <span class="error-msg">Format email tidak valid.</span>
+        </div>
+        <div class="form-group full" id="grp-alamat">
+          <label>Alamat Lengkap</label>
+          <textarea id="alamat" rows="3" placeholder="Jalan, nomor rumah, patokan"></textarea>
+          <span class="error-msg">Alamat minimal 8 karakter.</span>
+        </div>
+        <div class="form-group" id="grp-kota">
+          <label>Kota</label>
+          <input type="text" id="kota" placeholder="Kota">
+          <span class="error-msg">Kota wajib diisi.</span>
+        </div>
+        <div class="form-group" id="grp-pos">
+          <label>Kode Pos</label>
+          <input type="text" id="pos" placeholder="5 digit">
+          <span class="error-msg">Kode pos harus 5 digit angka.</span>
+        </div>
+      </div>
+    </form>
+
+    <h2>Metode Pembayaran</h2>
+    <label class="pay-method selected"><input type="radio" name="pay" value="transfer" checked> Transfer Bank</label>
+    <label class="pay-method"><input type="radio" name="pay" value="ewallet"> E-Wallet / QRIS</label>
+    <label class="pay-method"><input type="radio" name="pay" value="cod"> Bayar di Tempat (COD)</label>
+  </div>
+
+  <div class="panel">
+    <h2>Ringkasan Pesanan</h2>
+    <div id="checkoutItemsList"></div>
+    <hr style="border:none; border-top:1px solid var(--line); margin:14px 0;">
+    <div class="summary-line"><span>Subtotal</span><strong id="sumSubtotal">Rp0</strong></div>
+    <div class="summary-line"><span>Ongkos Kirim</span><strong id="sumOngkir">Rp0</strong></div>
+    <div class="summary-line" style="font-size:18px;"><span>Total</span><strong id="sumTotal">Rp0</strong></div>
+    <button class="btn btn-primary" style="width:100%; margin-top:14px;" id="checkoutBtn" onclick="simulatePayment()">Bayar Sekarang</button>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script>
+const cart = loadCart();
+if(cart.length===0){
+  document.querySelector("main").innerHTML = `<div class="panel" style="grid-column:1/-1; text-align:center;">
+    <h2>Keranjang kosong</h2>
+    <p>Belum ada pesanan untuk di-checkout.</p>
+    <a class="btn btn-primary" href="index.html">Kembali ke Menu</a>
+  </div>`;
+}
+
+function renderCheckoutSummary(){
+  const listEl = document.getElementById("checkoutItemsList");
+  listEl.innerHTML = cart.map(c=>`
+    <div class="summary-line"><span>${c.name} x${c.qty}</span><span>${rupiah(c.price*c.qty)}</span></div>
+  `).join("");
+  const subtotal = cartTotal(cart);
+  const total = cart.length ? subtotal+ONGKIR : 0;
+  document.getElementById("sumSubtotal").textContent = rupiah(subtotal);
+  document.getElementById("sumOngkir").textContent = cart.length ? rupiah(ONGKIR) : "Rp0";
+  document.getElementById("sumTotal").textContent = rupiah(total);
+}
+
+document.addEventListener("click", (e)=>{
+  const el = e.target.closest(".pay-method");
+  if(!el) return;
+  document.querySelectorAll(".pay-method").forEach(m=>m.classList.remove("selected"));
+  el.classList.add("selected");
+});
+
+function validateField(id, condition){
+  const grp = document.getElementById("grp-"+id);
+  if(condition){ grp.classList.remove("error"); return true; }
+  grp.classList.add("error"); return false;
+}
+
+function simulatePayment(){
+  if(cart.length===0){ showToast("Pesanan kamu masih kosong."); return; }
+  const nama = document.getElementById("nama").value.trim();
+  const telp = document.getElementById("telp").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const alamat = document.getElementById("alamat").value.trim();
+  const kota = document.getElementById("kota").value.trim();
+  const pos = document.getElementById("pos").value.trim();
+
+  let ok = true;
+  ok = validateField("nama", nama.length>=3) && ok;
+  ok = validateField("telp", /^0[0-9]{9,13}$/.test(telp)) && ok;
+  ok = validateField("email", /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) && ok;
+  ok = validateField("alamat", alamat.length>=8) && ok;
+  ok = validateField("kota", kota.length>=2) && ok;
+  ok = validateField("pos", /^[0-9]{5}$/.test(pos)) && ok;
+  if(!ok){ showToast("Lengkapi data dengan benar dulu ya 📝"); return; }
+
+  const payMethod = document.querySelector('input[name="pay"]:checked').value;
+  const total = cartTotal(cart)+ONGKIR;
+  const savedOrder = saveOrder({nama, telp, email, alamat, kota, pos, payMethod, subtotal:cartTotal(cart), ongkir:ONGKIR, total, items:cart.map(c=>({id:c.id, name:c.name, price:c.price, qty:c.qty}))});
+
+  saveCart([]);
+  window.location.href = "order-sukses.html?id="+savedOrder.id;
+}
+
+renderCheckoutSummary();
+</script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pesanan Berhasil — Kopi Senja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="container">
+    <a href="index.html" class="brand">Kopi<span class="dot">.</span>Senja</a>
+    <nav class="main"><a href="index.html">Menu</a><a href="lacak-pesanan.html">Lacak Pesanan</a></nav>
+    <div class="header-actions"></div>
+  </div>
+</header>
+
+<main class="container" style="padding:60px 0; max-width:640px;">
+  <div class="panel" style="text-align:center;" id="successPanel">
+    <div style="font-size:48px;">🎉</div>
+    <h2>Pesanan Berhasil Dibuat!</h2>
+    <p id="successMsg" style="color:var(--ink-soft);"></p>
+    <div class="panel" style="text-align:left; margin-top:20px;" id="orderDetail"></div>
+    <a class="btn btn-primary" href="lacak-pesanan.html" id="trackLink">Lacak Pesanan Ini</a>
+    <a class="btn btn-outline" style="background:var(--ink); margin-left:8px;" href="index.html">Belanja Lagi</a>
+  </div>
+</main>
+
+<footer class="site"><div class="container">© Kopi Senja. Ngopi ala cafe, kapan aja.</div></footer>
+
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script>
+const params = new URLSearchParams(window.location.search);
+const orderId = params.get("id");
+const order = orderId ? findOrder(orderId) : null;
+
+if(!order){
+  document.getElementById("successPanel").innerHTML = `
+    <h2>Pesanan tidak ditemukan</h2>
+    <p>Nomor pesanan tidak valid atau sudah tidak ada di riwayat browser ini.</p>
+    <a class="btn btn-primary" href="index.html">Kembali ke Menu</a>`;
+} else {
+  const payLabel = order.payMethod==='transfer' ? 'Transfer Bank' : order.payMethod==='ewallet' ? 'E-Wallet/QRIS' : 'COD';
+  document.getElementById("successMsg").textContent =
+    `Terima kasih, ${order.nama}! Pesanan senilai ${rupiah(order.total)} via ${payLabel} sedang diseduh.`;
+  document.getElementById("orderDetail").innerHTML = `
+    <div class="summary-line"><span>No. Pesanan</span><strong>${order.id}</strong></div>
+    <div class="summary-line"><span>Status</span><strong>${order.status}</strong></div>
+    <hr style="border:none; border-top:1px solid var(--line);">
+    ${order.items.map(i=>`<div class="summary-line"><span>${i.name} x${i.qty}</span><span>${rupiah(i.price*i.qty)}</span></div>`).join("")}
+    <hr style="border:none; border-top:1px solid var(--line);">
+    <div class="summary-line"><span>Total</span><strong>${rupiah(order.total)}</strong></div>
+    <p style="font-size:13px; color:var(--ink-soft); margin-top:10px;">Simpan nomor pesanan ini untuk melacak status pengantaran.</p>
+  `;
+  document.getElementById("trackLink").href = "lacak-pesanan.html?id="+order.id;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lacak Pesanan — Kopi Senja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="container">
+    <a href="index.html" class="brand">Kopi<span class="dot">.</span>Senja</a>
+    <nav class="main"><a href="index.html">Menu</a><a href="lacak-pesanan.html" class="active">Lacak Pesanan</a></nav>
+    <div class="header-actions"></div>
+  </div>
+</header>
+
+<main class="container" style="padding:50px 0 80px; max-width:640px;">
+  <div class="panel">
+    <h2>Lacak Pesanan</h2>
+    <p style="color:var(--ink-soft); font-size:14px;">Masukkan nomor pesanan (contoh: KS12345678) atau nomor HP yang dipakai saat checkout.</p>
+    <div class="form-group full">
+      <label>Nomor Pesanan / No. HP</label>
+      <input type="text" id="searchInput" placeholder="KS12345678 atau 08xxxxxxxxxx">
+    </div>
+    <button class="btn btn-primary" onclick="doSearch()">Cari Pesanan</button>
+  </div>
+
+  <div id="result"></div>
+</main>
+
+<footer class="site"><div class="container">© Kopi Senja. Ngopi ala cafe, kapan aja.</div></footer>
+
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script>
+const STEPS = ["Diproses","Diseduh","Diantar","Selesai"];
+
+function renderOrderCard(o){
+  const stepIndex = Math.max(0, STEPS.indexOf(o.status));
+  return `
+    <div class="panel">
+      <div class="summary-line"><span>No. Pesanan</span><strong>${o.id}</strong></div>
+      <div class="summary-line"><span>Atas Nama</span><strong>${o.nama}</strong></div>
+      <div class="status-track">
+        ${STEPS.map((s,i)=>`<div class="status-step ${i<=stepIndex?'done':''}"><div class="dot"></div>${s}</div>`).join("")}
+      </div>
+      <hr style="border:none; border-top:1px solid var(--line);">
+      ${o.items.map(i=>`<div class="summary-line"><span>${i.name} x${i.qty}</span><span>${rupiah(i.price*i.qty)}</span></div>`).join("")}
+      <hr style="border:none; border-top:1px solid var(--line);">
+      <div class="summary-line"><span>Total</span><strong>${rupiah(o.total)}</strong></div>
+    </div>`;
+}
+
+function doSearch(){
+  const q = document.getElementById("searchInput").value.trim();
+  const resultEl = document.getElementById("result");
+  if(!q){ resultEl.innerHTML = `<p style="color:var(--ink-soft);">Masukkan nomor pesanan atau no. HP dulu ya.</p>`; return; }
+  const orders = loadOrders();
+  const matches = orders.filter(o => o.id.toLowerCase()===q.toLowerCase() || o.telp===q);
+  resultEl.innerHTML = matches.length
+    ? matches.map(renderOrderCard).join("")
+    : `<p style="color:var(--ink-soft);">Pesanan tidak ditemukan. Cek kembali nomor pesanan / HP kamu.</p>`;
+}
+
+const params = new URLSearchParams(window.location.search);
+const presetId = params.get("id");
+if(presetId){ document.getElementById("searchInput").value = presetId; doSearch(); }
+</script>
+</body>
+</html>
