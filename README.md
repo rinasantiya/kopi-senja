@@ -8,11 +8,11 @@ Website pemesanan kopi online untuk cafe **Kopi Senja**, lengkap dengan halaman 
 
 | Keterangan | Detail |
 |---|---|
-| **Nama** | (isi nama kamu) |
-| **NIM** | (isi NIM kamu) |
-| **Mata Kuliah** | (isi mata kuliah) |
-| **Program Studi** | (isi program studi) |
-| **Semester** | (isi semester) |
+| **Nama** | Rina Santiya |
+| **NIM** | 209250151 |
+| **Mata Kuliah** | KOMPUTER APLIKASI IT II |
+| **Program Studi** | Administrasi Bisnis |
+| **Semester** | Genap 2025/2026 |
 
 ---
 
@@ -20,7 +20,7 @@ Website pemesanan kopi online untuk cafe **Kopi Senja**, lengkap dengan halaman 
 
 | Keterangan | Link |
 |---|---|
-| **Live Website (Customer)** | (isi link GitHub Pages setelah deploy, mis. `https://username.github.io/fruitybite/`) |
+| **Live Website (Customer)** | https://rinasantiya.github.io/kopi-senja/ |
 | **Halaman Admin** | (isi link admin dashboard setelah tersedia) |
 | **Repository GitHub** | (isi link repo) |
 
