@@ -21,7 +21,7 @@ Website pemesanan kopi online untuk cafe **Kopi Senja**, lengkap dengan halaman 
 | Keterangan | Link |
 |---|---|
 | **Live Website (Customer)** | https://rinasantiya.github.io/kopi-senja/ |
-| **Halaman Yutube** | (isi link admin dashboard setelah tersedia) |
+| **Halaman Youtube** | (isi link admin dashboard setelah tersedia) |
 | **Repository GitHub** | https://github.com/rinasantiya/kopi-senja |
 
 ---
